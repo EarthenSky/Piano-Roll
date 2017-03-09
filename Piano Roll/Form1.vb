@@ -13,9 +13,9 @@ Public Class Form1
     '
     'Play a piano on the piano roll
 
-    Const shtBlockSize As Short = 16
+    Const shtBlockSize As Short = 8
 
-    Private arrayValue(512, 60) As Integer
+    Private arrayValue(512, 60) As Integer '1 is start of note, 2 is body, 3 is end, 0 is no note.
 
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
@@ -25,6 +25,22 @@ Public Class Form1
         If e.Button = Windows.Forms.MouseButtons.Left Then
             Dim xIndex = e.X + 6 \ shtBlockSize
             Dim yIndex = e.Y + 6 \ shtBlockSize
+
+            FindAndDeleteNote(xIndex, yIndex)
+            arrayValue(xIndex, yIndex) = 1
+
+            FindAndDeleteNote(xIndex + 1, yIndex)
+            arrayValue(xIndex + 1, yIndex) = 3
+        End If
+    End Sub
+
+    Private Sub FindAndDeleteNote(ByVal xIndex As Short, ByVal yIndex As Short)
+        If arrayValue(xIndex, yIndex) <> 0 Then
+            If arrayValue(xIndex, yIndex) = 1 Then
+                While arrayValue(xIndex, yIndex) <> 3
+
+                End While
+            End If
         End If
     End Sub
 
