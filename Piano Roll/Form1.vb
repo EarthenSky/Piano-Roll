@@ -13,7 +13,7 @@ Public Class Form1
     '
     'Play a piano on the piano roll
 
-    Const shtBlockSize As Short = 50
+    Const shtBlockSize As Short = 16
 
     Private arrayValue(512, 60) As Integer
 
