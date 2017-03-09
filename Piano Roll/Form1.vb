@@ -8,23 +8,28 @@ Enum Note
 End Enum
 
 Public Class Form1
-    'Piano Roll
+    'Piano Roll 
     'Gabe Stang
     '
     'Play a piano on the piano roll
 
-    Private multiDimValue As Integer()()
+    Const shtBlockSize As Short = 50
+
+    Private arrayValue(512, 60) As Integer
 
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
     End Sub
 
-    Private Sub MouseDownClick() Handles MyBase.MouseClick
-
+    Private Sub MouseDownClick(ByVal sender As System.Object, ByVal e As MouseEventArgs) Handles pnlGrid.MouseDown
+        If e.Button = Windows.Forms.MouseButtons.Left Then
+            Dim xIndex = e.X + 6 \ shtBlockSize
+            Dim yIndex = e.Y + 6 \ shtBlockSize
+        End If
     End Sub
 
     Private Sub Button1Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
-        Console.Beep(440, 100) 'A4 
+        PlaySound(Note.A4, 100)
     End Sub
     ''' <summary>
     ''' Plays a sound based on the note and the length
@@ -33,7 +38,6 @@ Public Class Form1
     Private Sub PlaySound(ByVal note As Note, ByVal length As Short)
         Console.Beep(note, length)
     End Sub
-
 End Class
 
 '//           ▄███▄  /
