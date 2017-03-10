@@ -40,7 +40,7 @@ Public Class Form1
             Me.Text = "X: " & xIndex & " Y: " & yIndex
 
             If yIndex = 0 Then
-                PlaySound(Note.F5, 50)
+                PlaySound(7000, 50)
             ElseIf yIndex = 1 Then
                 PlaySound(Note.E5, 50)
             ElseIf yIndex = 2 Then
@@ -57,7 +57,6 @@ Public Class Form1
                 PlaySound(Note.Ash4, 50)
             ElseIf yIndex = 8 Then
                 PlaySound(Note.A4, 50)
-
             End If
 
             'places a note at the specific place clicked
@@ -70,11 +69,26 @@ Public Class Form1
     End Sub
 
     Private Sub FindAndDeleteNote(ByVal xIndex As Short, ByVal yIndex As Short)
+        Dim shtCurrentPlace As Short = 0
         If arrayValue(xIndex, yIndex) <> 0 Then
             If arrayValue(xIndex, yIndex) = 1 Then
-                While arrayValue(xIndex, yIndex) <> 3
+                While arrayValue(xIndex + shtCurrentPlace, yIndex) <> 3  'check down the row if it is a part of a note and delete it.
+                    arrayValue(xIndex + shtCurrentPlace, yIndex) = 0
+                    shtCurrentPlace += 1
+                End While
+                arrayValue(xIndex + shtCurrentPlace, yIndex) = 0
+
+            ElseIf arrayValue(xIndex, yIndex) = 2 Then
+                While arrayValue(xIndex + shtCurrentPlace, yIndex) <> 0
+                    If arrayValue(xIndex + shtCurrentPlace, yIndex) = 2 Then
+                        arrayValue(xIndex + shtCurrentPlace, yIndex) = 0
+                        shtCurrentPlace -= 1
+                    ElseIf arrayValue(xIndex + shtCurrentPlace, yIndex) = 1 Then
+
+                    End If
 
                 End While
+
             End If
         End If
     End Sub

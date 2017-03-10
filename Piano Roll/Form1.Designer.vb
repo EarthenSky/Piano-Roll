@@ -32,7 +32,7 @@ Partial Class Form1
         Me.pnlGrid.BackColor = System.Drawing.SystemColors.ControlDark
         Me.pnlGrid.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.pnlGrid.Controls.Add(Me.Button1)
-        Me.pnlGrid.Location = New System.Drawing.Point(12, 12)
+        Me.pnlGrid.Location = New System.Drawing.Point(12, 11)
         Me.pnlGrid.Name = "pnlGrid"
         Me.pnlGrid.Size = New System.Drawing.Size(1170, 553)
         Me.pnlGrid.TabIndex = 0
