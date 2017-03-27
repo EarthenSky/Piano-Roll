@@ -29,6 +29,7 @@ Partial Class Form1
         Me.tbxDebugLog = New System.Windows.Forms.TextBox()
         Me.pbxGrid = New System.Windows.Forms.PictureBox()
         Me.tmrUpdate = New System.Windows.Forms.Timer(Me.components)
+        Me.Label1 = New System.Windows.Forms.Label()
         CType(Me.pbxGrid, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -64,10 +65,10 @@ Partial Class Form1
         '
         'tbxDebugLog
         '
-        Me.tbxDebugLog.Location = New System.Drawing.Point(208, 497)
+        Me.tbxDebugLog.Location = New System.Drawing.Point(330, 497)
         Me.tbxDebugLog.Multiline = True
         Me.tbxDebugLog.Name = "tbxDebugLog"
-        Me.tbxDebugLog.Size = New System.Drawing.Size(764, 32)
+        Me.tbxDebugLog.Size = New System.Drawing.Size(642, 32)
         Me.tbxDebugLog.TabIndex = 4
         Me.tbxDebugLog.Text = "5 octaves, B7 - B2"
         '
@@ -85,12 +86,24 @@ Partial Class Form1
         Me.tmrUpdate.Enabled = True
         Me.tmrUpdate.Interval = 16
         '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.BackColor = System.Drawing.SystemColors.ScrollBar
+        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label1.Location = New System.Drawing.Point(208, 498)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(116, 29)
+        Me.Label1.TabIndex = 0
+        Me.Label1.Text = "BPM: 120"
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.SystemColors.GradientActiveCaption
         Me.ClientSize = New System.Drawing.Size(984, 541)
+        Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.pbxGrid)
         Me.Controls.Add(Me.tbxDebugLog)
         Me.Controls.Add(Me.btnPlay)
@@ -112,4 +125,5 @@ Partial Class Form1
     Friend WithEvents pnlNotes As System.Windows.Forms.Panel
     Friend WithEvents pbxGrid As System.Windows.Forms.PictureBox
     Friend WithEvents tmrUpdate As Timer
+    Friend WithEvents Label1 As System.Windows.Forms.Label
 End Class
