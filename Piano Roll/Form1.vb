@@ -59,6 +59,9 @@ Public Class Form1
     Private imgRedTile As Image = Image.FromFile(currentFileDirectory & "RedTile.png")
     Private imgBrownTile As Image = Image.FromFile(currentFileDirectory & "BrownTile.png")
     Private imgTealTile As Image = Image.FromFile(currentFileDirectory & "TealTile.png")
+    Private imgTintedRedTile As Image = Image.FromFile(currentFileDirectory & "TintedRedTile.png")
+    Private imgTintedBrownTile As Image = Image.FromFile(currentFileDirectory & "TintedBrownTile.png")
+    Private imgTintedTealTile As Image = Image.FromFile(currentFileDirectory & "TintedTealTile.png")
 
     Private aryNoteValue(511, 59) As BlockValue 'Holds values of notes
 
@@ -74,12 +77,18 @@ Public Class Form1
             For yPos As Integer = 0 To aryNoteValue.GetLength(1) - 1
                 If aryNoteValue(xPos, yPos) = BlockValue.Empty Then
                     Continue For 'TOME: Arbitrary but nice to see for parsing through code.
-                ElseIf aryNoteValue(xPos, yPos) = BlockValue.Start OrElse aryNoteValue(xPos, yPos) = BlockValue.StartColour Then
+                ElseIf aryNoteValue(xPos, yPos) = BlockValue.Start Then
                     e.Graphics.DrawImage(imgRedTile, New Point(xPos * shtBlockSizeX, yPos * shtBlockSizeY))
-                ElseIf aryNoteValue(xPos, yPos) = BlockValue.Body OrElse aryNoteValue(xPos, yPos) = BlockValue.BodyColour Then
+                ElseIf aryNoteValue(xPos, yPos) = BlockValue.Body Then
                     e.Graphics.DrawImage(imgBrownTile, New Point(xPos * shtBlockSizeX, yPos * shtBlockSizeY))
-                ElseIf aryNoteValue(xPos, yPos) = BlockValue.Close OrElse aryNoteValue(xPos, yPos) = BlockValue.CloseColour Then
+                ElseIf aryNoteValue(xPos, yPos) = BlockValue.Close Then
                     e.Graphics.DrawImage(imgTealTile, New Point(xPos * shtBlockSizeX, yPos * shtBlockSizeY))
+                ElseIf aryNoteValue(xPos, yPos) = BlockValue.StartColour Then
+                    e.Graphics.DrawImage(imgTintedRedTile, New Point(xPos * shtBlockSizeX, yPos * shtBlockSizeY))
+                ElseIf aryNoteValue(xPos, yPos) = BlockValue.BodyColour Then
+                    e.Graphics.DrawImage(imgTintedBrownTile, New Point(xPos * shtBlockSizeX, yPos * shtBlockSizeY))
+                ElseIf aryNoteValue(xPos, yPos) = BlockValue.CloseColour Then
+                    e.Graphics.DrawImage(imgTintedTealTile, New Point(xPos * shtBlockSizeX, yPos * shtBlockSizeY))
                 End If
             Next yPos
         Next xPos
@@ -136,23 +145,25 @@ Public Class Form1
                 aryNoteValue(xIndex, yIndex) = BlockValue.Start
 
             ElseIf aryNoteValue(xIndex, yIndex) = BlockValue.Start Then
-                Me.tbxDebugLog.Text += " 1"
-                'changes the colour of the start block
-                aryNoteValue(xIndex, yIndex) = BlockValue.BodyColour  'Colour change is so you know you clicked it.  TODO: add new tinted colours. (i.e. dark blue)
-                pntLastMousePos = New Point(xIndex, yIndex)
+                If blnIsStartMoving = False Then
+                    Me.tbxDebugLog.Text += " 1"
+                    'changes the colour of the start block
+                    aryNoteValue(xIndex, yIndex) = BlockValue.StartColour  'Colour change is so you know you clicked it.
+                    pntLastMousePos = New Point(xIndex, yIndex)
 
-                Dim shtCurrentPlace As Short = 0
-                While aryNoteValue(xIndex + shtCurrentPlace, yIndex) <> 3
+                    Dim shtCurrentPlace As Short = 0
+                    While aryNoteValue(xIndex + shtCurrentPlace, yIndex) <> 3
+                        lstLastNote.Add(aryNoteValue(xIndex + shtCurrentPlace, yIndex))
+                        shtCurrentPlace += 1
+
+                    End While
                     lstLastNote.Add(aryNoteValue(xIndex + shtCurrentPlace, yIndex))
-                    shtCurrentPlace += 1
+                    blnIsStartMoving = True
 
-                End While
-                blnIsStartMoving = True
-
+                End If
             End If
             Refresh()
         End If
-        Refresh()
     End Sub
 
     ''' <summary>
@@ -163,15 +174,15 @@ Public Class Form1
         If aryNoteValue(xIndex, yIndex) <> BlockValue.Empty Then
             'check down the row.  If it is a part of a note, delete it.  Stop when it hits the end of the note.
 
-            If aryNoteValue(xIndex, yIndex) = BlockValue.Start Then
-                While aryNoteValue(xIndex + shtCurrentPlace, yIndex) <> BlockValue.Close
+            If aryNoteValue(xIndex, yIndex) = BlockValue.Start OrElse aryNoteValue(xIndex, yIndex) = BlockValue.StartColour Then
+                While aryNoteValue(xIndex + shtCurrentPlace, yIndex) <> BlockValue.Close AndAlso aryNoteValue(xIndex + shtCurrentPlace, yIndex) <> BlockValue.CloseColour
                     aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
                     shtCurrentPlace += 1
 
                 End While
                 aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
 
-            ElseIf aryNoteValue(xIndex, yIndex) = BlockValue.Body Then
+            ElseIf aryNoteValue(xIndex, yIndex) = BlockValue.Body OrElse aryNoteValue(xIndex, yIndex) = BlockValue.BodyColour Then
                 'check up the row.  If it is a part of a note, delete it.  
                 'When it hits the start of the note go back to the middle and start down the note until it hits the end of the note. 
 
@@ -180,11 +191,11 @@ Public Class Form1
                 shtCurrentPlace -= 1
 
                 While aryNoteValue(xIndex + shtCurrentPlace, yIndex) <> BlockValue.Empty
-                    If aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Body Then
+                    If aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Body OrElse aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.BodyColour Then
                         aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
                         shtCurrentPlace -= 1
 
-                    ElseIf aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Start Then
+                    ElseIf aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Start OrElse aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.StartColour Then
                         aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
                         shtCurrentPlace = 0
                         Exit While
@@ -193,11 +204,11 @@ Public Class Form1
                 End While
 
                 While aryNoteValue(xIndex + shtCurrentPlace, yIndex) <> BlockValue.Empty
-                    If aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Body Then
+                    If aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Body OrElse aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.BodyColour Then
                         aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
                         shtCurrentPlace += 1
 
-                    ElseIf aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Close Then
+                    ElseIf aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Close OrElse aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.CloseColour Then
                         aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
                         Exit While
 
@@ -237,8 +248,9 @@ Public Class Form1
 
     Private Sub tmrUpdateTick() Handles tmrUpdate.Tick
         If blnIsStartMoving = True Then
-            xIndex = (MousePosition.X - (Me.Bounds.Location.X + 20)) \ shtBlockSizeX
-            yIndex = (MousePosition.Y - (Me.Bounds.Location.Y + 43)) \ shtBlockSizeY
+            xIndex = (MousePosition.X - (Me.Bounds.Location.X + 23)) \ shtBlockSizeX + 1
+            yIndex = (MousePosition.Y - (Me.Bounds.Location.Y + 45)) \ shtBlockSizeY + 1
+            Me.Text = yIndex.ToString & " " & pntLastMousePos.Y.ToString
 
             If xIndex <> pntLastMousePos.X OrElse yIndex <> pntLastMousePos.Y Then  'If the cursor has moved from last position
                 FindAndDeleteNote(pntLastMousePos.X, pntLastMousePos.Y) 'Deletes the last note.
@@ -251,7 +263,7 @@ Public Class Form1
 
                 Next block
                 pntLastMousePos = New Point(xIndex, yIndex)
-
+                Refresh()
             End If
 
         End If

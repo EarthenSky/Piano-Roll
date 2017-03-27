@@ -149,6 +149,9 @@
     <Content Include="Sounds\PianoC3.wav" />
     <Content Include="RedTile.png" />
     <Content Include="TealTile.png" />
+    <Content Include="TintedBrownTile.png" />
+    <Content Include="TintedRedTile.png" />
+    <Content Include="TintedTealTile.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
