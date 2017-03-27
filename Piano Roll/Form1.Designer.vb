@@ -22,11 +22,13 @@ Partial Class Form1
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.btnLeft = New System.Windows.Forms.Button()
         Me.btnRight = New System.Windows.Forms.Button()
         Me.btnPlay = New System.Windows.Forms.Button()
         Me.tbxDebugLog = New System.Windows.Forms.TextBox()
         Me.pbxGrid = New System.Windows.Forms.PictureBox()
+        Me.tmrUpdate = New System.Windows.Forms.Timer(Me.components)
         CType(Me.pbxGrid, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -78,6 +80,11 @@ Partial Class Form1
         Me.pbxGrid.TabIndex = 5
         Me.pbxGrid.TabStop = False
         '
+        'tmrUpdate
+        '
+        Me.tmrUpdate.Enabled = True
+        Me.tmrUpdate.Interval = 16
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -104,5 +111,5 @@ Partial Class Form1
     Friend WithEvents tbxDebugLog As System.Windows.Forms.TextBox
     Friend WithEvents pnlNotes As System.Windows.Forms.Panel
     Friend WithEvents pbxGrid As System.Windows.Forms.PictureBox
-
+    Friend WithEvents tmrUpdate As Timer
 End Class

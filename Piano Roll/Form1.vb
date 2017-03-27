@@ -43,11 +43,15 @@ Public Class Form1
     Const shtBlockSizeX As Short = 8
     Const shtBlockSizeY As Short = 8
 
+    Private xIndex = 0
+    Private yIndex = 0
+
     Private blnIsStartMoving As Boolean = False
     Private blnIsCloseMoving As Boolean = False
     Private blnIsBodyMoving As Boolean = False
 
     Private pntLastMousePos As Point = New Point(0, 0)
+    Private lstLastNote As List(Of BlockValue) = New List(Of BlockValue)
 
     Private currentFileDirectory As String = Directory.GetCurrentDirectory.Remove(Directory.GetCurrentDirectory.IndexOf("\bin\Debug"), 10) + "\"
 
@@ -56,7 +60,7 @@ Public Class Form1
     Private imgBrownTile As Image = Image.FromFile(currentFileDirectory & "BrownTile.png")
     Private imgTealTile As Image = Image.FromFile(currentFileDirectory & "TealTile.png")
 
-    Private arrayNoteValue(511, 59) As BlockValue 'Holds values of notes
+    Private aryNoteValue(511, 59) As BlockValue 'Holds values of notes
 
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
@@ -66,15 +70,15 @@ Public Class Form1
         e.Graphics.DrawImage(Image.FromFile(currentFileDirectory & "Grid of tiles.png"), Point.Empty)
 
         'Problem? VVV  Fixed... i think.
-        For xPos As Integer = 0 To arrayNoteValue.GetLength(0) - 1 'goes through each value and sets the colour
-            For yPos As Integer = 0 To arrayNoteValue.GetLength(1) - 1
-                If arrayNoteValue(xPos, yPos) = BlockValue.Empty Then
+        For xPos As Integer = 0 To aryNoteValue.GetLength(0) - 1 'goes through each value and sets the colour
+            For yPos As Integer = 0 To aryNoteValue.GetLength(1) - 1
+                If aryNoteValue(xPos, yPos) = BlockValue.Empty Then
                     Continue For 'TOME: Arbitrary but nice to see for parsing through code.
-                ElseIf arrayNoteValue(xPos, yPos) = BlockValue.Start OrElse arrayNoteValue(xPos, yPos) = BlockValue.StartColour Then
+                ElseIf aryNoteValue(xPos, yPos) = BlockValue.Start OrElse aryNoteValue(xPos, yPos) = BlockValue.StartColour Then
                     e.Graphics.DrawImage(imgRedTile, New Point(xPos * shtBlockSizeX, yPos * shtBlockSizeY))
-                ElseIf arrayNoteValue(xPos, yPos) = BlockValue.Body OrElse arrayNoteValue(xPos, yPos) = BlockValue.BodyColour Then
+                ElseIf aryNoteValue(xPos, yPos) = BlockValue.Body OrElse aryNoteValue(xPos, yPos) = BlockValue.BodyColour Then
                     e.Graphics.DrawImage(imgBrownTile, New Point(xPos * shtBlockSizeX, yPos * shtBlockSizeY))
-                ElseIf arrayNoteValue(xPos, yPos) = BlockValue.Close OrElse arrayNoteValue(xPos, yPos) = BlockValue.CloseColour Then
+                ElseIf aryNoteValue(xPos, yPos) = BlockValue.Close OrElse aryNoteValue(xPos, yPos) = BlockValue.CloseColour Then
                     e.Graphics.DrawImage(imgTealTile, New Point(xPos * shtBlockSizeX, yPos * shtBlockSizeY))
                 End If
             Next yPos
@@ -83,22 +87,22 @@ Public Class Form1
 
     Private Sub MouseUpClick(ByVal sender As System.Object, ByVal e As MouseEventArgs) Handles pbxGrid.MouseUp
         If e.Button = Windows.Forms.MouseButtons.Left Then
-            Dim xIndex = (e.X + 0) \ shtBlockSizeX
-            Dim yIndex = (e.Y + 0) \ shtBlockSizeY
+            xIndex = (e.X + 0) \ shtBlockSizeX
+            yIndex = (e.Y + 0) \ shtBlockSizeY
 
-            If blnIsStartMoving = True Then 'TODO: what do I do in this case?
-                arrayNoteValue(pntLastMousePos.X, pntLastMousePos.Y) = BlockValue.Start
+            If blnIsStartMoving = True Then
+                aryNoteValue(pntLastMousePos.X, pntLastMousePos.Y) = BlockValue.Start
                 blnIsStartMoving = False
-
+                lstLastNote.Clear()  'Clear the list for next movement
             End If
-
+            Refresh()
         End If
     End Sub
 
     Private Sub MouseDownClick(ByVal sender As System.Object, ByVal e As MouseEventArgs) Handles pbxGrid.MouseDown
         If e.Button = Windows.Forms.MouseButtons.Left Then
-            Dim xIndex = (e.X + 0) \ shtBlockSizeX
-            Dim yIndex = (e.Y + 0) \ shtBlockSizeY
+            xIndex = (e.X + 0) \ shtBlockSizeX
+            yIndex = (e.Y + 0) \ shtBlockSizeY
             Me.Text = "X: " & xIndex & " Y: " & yIndex
 
             'tests
@@ -121,23 +125,32 @@ Public Class Form1
                 Case 10
                 Case 11
                 Case 12
+
             End Select
 
-            If arrayNoteValue(xIndex, yIndex) = BlockValue.Empty Then
-                tbxDebugLog.Text += " 0"
+            If aryNoteValue(xIndex, yIndex) = BlockValue.Empty Then
+                Me.tbxDebugLog.Text += " 0"
                 'places a note at the specific place clicked
                 FindAndDeleteNote(xIndex + 1, yIndex)
-                arrayNoteValue(xIndex + 1, yIndex) = BlockValue.Close
-                arrayNoteValue(xIndex, yIndex) = BlockValue.Start
+                aryNoteValue(xIndex + 1, yIndex) = BlockValue.Close
+                aryNoteValue(xIndex, yIndex) = BlockValue.Start
 
-            ElseIf arrayNoteValue(xIndex, yIndex) = BlockValue.Start Then
-                tbxDebugLog.Text += " 1"
+            ElseIf aryNoteValue(xIndex, yIndex) = BlockValue.Start Then
+                Me.tbxDebugLog.Text += " 1"
                 'changes the colour of the start block
-                arrayNoteValue(xIndex, yIndex) = BlockValue.BodyColour  'So you know you clicked it.  TODO: add new tinted colours.
+                aryNoteValue(xIndex, yIndex) = BlockValue.BodyColour  'Colour change is so you know you clicked it.  TODO: add new tinted colours. (i.e. dark blue)
                 pntLastMousePos = New Point(xIndex, yIndex)
+
+                Dim shtCurrentPlace As Short = 0
+                While aryNoteValue(xIndex + shtCurrentPlace, yIndex) <> 3
+                    lstLastNote.Add(aryNoteValue(xIndex + shtCurrentPlace, yIndex))
+                    shtCurrentPlace += 1
+
+                End While
                 blnIsStartMoving = True
 
             End If
+            Refresh()
         End If
         Refresh()
     End Sub
@@ -147,64 +160,64 @@ Public Class Form1
     ''' </summary>
     Private Sub FindAndDeleteNote(ByVal xIndex As Short, ByVal yIndex As Short)
         Dim shtCurrentPlace As Short = 0
-        If arrayNoteValue(xIndex, yIndex) <> 0 Then
+        If aryNoteValue(xIndex, yIndex) <> BlockValue.Empty Then
             'check down the row.  If it is a part of a note, delete it.  Stop when it hits the end of the note.
 
-            If arrayNoteValue(xIndex, yIndex) = 1 Then
-                While arrayNoteValue(xIndex + shtCurrentPlace, yIndex) <> 3
-                    arrayNoteValue(xIndex + shtCurrentPlace, yIndex) = 0
+            If aryNoteValue(xIndex, yIndex) = BlockValue.Start Then
+                While aryNoteValue(xIndex + shtCurrentPlace, yIndex) <> BlockValue.Close
+                    aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
                     shtCurrentPlace += 1
 
                 End While
-                arrayNoteValue(xIndex + shtCurrentPlace, yIndex) = 0
+                aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
 
-            ElseIf arrayNoteValue(xIndex, yIndex) = 2 Then
+            ElseIf aryNoteValue(xIndex, yIndex) = BlockValue.Body Then
                 'check up the row.  If it is a part of a note, delete it.  
                 'When it hits the start of the note go back to the middle and start down the note until it hits the end of the note. 
 
                 'deletes the 3
-                arrayNoteValue(xIndex + shtCurrentPlace, yIndex) = 0
+                aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
                 shtCurrentPlace -= 1
 
-                While arrayNoteValue(xIndex + shtCurrentPlace, yIndex) <> 0
-                    If arrayNoteValue(xIndex + shtCurrentPlace, yIndex) = 2 Then
-                        arrayNoteValue(xIndex + shtCurrentPlace, yIndex) = 0
+                While aryNoteValue(xIndex + shtCurrentPlace, yIndex) <> BlockValue.Empty
+                    If aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Body Then
+                        aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
                         shtCurrentPlace -= 1
 
-                    ElseIf arrayNoteValue(xIndex + shtCurrentPlace, yIndex) = 1 Then
-                        arrayNoteValue(xIndex + shtCurrentPlace, yIndex) = 0
+                    ElseIf aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Start Then
+                        aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
                         shtCurrentPlace = 0
                         Exit While
 
                     End If
                 End While
 
-                While arrayNoteValue(xIndex + shtCurrentPlace, yIndex) <> 0
-                    If arrayNoteValue(xIndex + shtCurrentPlace, yIndex) = 2 Then
-                        arrayNoteValue(xIndex + shtCurrentPlace, yIndex) = 0
+                While aryNoteValue(xIndex + shtCurrentPlace, yIndex) <> BlockValue.Empty
+                    If aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Body Then
+                        aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
                         shtCurrentPlace += 1
 
-                    ElseIf arrayNoteValue(xIndex + shtCurrentPlace, yIndex) = 3 Then
-                        arrayNoteValue(xIndex + shtCurrentPlace, yIndex) = 0
+                    ElseIf aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Close Then
+                        aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
                         Exit While
 
                     End If
                 End While
 
-            ElseIf arrayNoteValue(xIndex, yIndex) = 3 Then
+            ElseIf aryNoteValue(xIndex, yIndex) = BlockValue.Close Then
                 'Check up the row.  If it is a part of a note, delete it.  When it hits the start of the note stop. 
 
                 'deletes the 3
-                arrayNoteValue(xIndex + shtCurrentPlace, yIndex) = 0
+                aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
                 shtCurrentPlace -= 1
 
-                While arrayNoteValue(xIndex + shtCurrentPlace, yIndex) <> 0
-                    If arrayNoteValue(xIndex + shtCurrentPlace, yIndex) = 2 Then
-                        arrayNoteValue(xIndex + shtCurrentPlace, yIndex) = 0
+                While aryNoteValue(xIndex + shtCurrentPlace, yIndex) <> BlockValue.Empty
+                    If aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Body Then
+                        aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
                         shtCurrentPlace -= 1
 
-                    ElseIf arrayNoteValue(xIndex + shtCurrentPlace, yIndex) = 1 Then
-                        arrayNoteValue(xIndex + shtCurrentPlace, yIndex) = 0
+                    ElseIf aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Start Then
+                        aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
                         shtCurrentPlace = 0
                         Exit While
 
@@ -222,6 +235,27 @@ Public Class Form1
         Console.Beep(note, length)
     End Sub
 
+    Private Sub tmrUpdateTick() Handles tmrUpdate.Tick
+        If blnIsStartMoving = True Then
+            xIndex = (MousePosition.X - (Me.Bounds.Location.X + 20)) \ shtBlockSizeX
+            yIndex = (MousePosition.Y - (Me.Bounds.Location.Y + 43)) \ shtBlockSizeY
+
+            If xIndex <> pntLastMousePos.X OrElse yIndex <> pntLastMousePos.Y Then  'If the cursor has moved from last position
+                FindAndDeleteNote(pntLastMousePos.X, pntLastMousePos.Y) 'Deletes the last note.
+
+                Dim shtCurrentPlace As Short = 0
+                For Each block As BlockValue In lstLastNote 'places a new note
+                    FindAndDeleteNote(xIndex + shtCurrentPlace, yIndex)  'Makes sure the note is not placed ontop of another.  TODO: this is not the best solution
+                    aryNoteValue(xIndex + shtCurrentPlace, yIndex) = block
+                    shtCurrentPlace += 1
+
+                Next block
+                pntLastMousePos = New Point(xIndex, yIndex)
+
+            End If
+
+        End If
+    End Sub
 End Class
 
 '//           ▄███▄  /
