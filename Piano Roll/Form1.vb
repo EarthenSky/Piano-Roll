@@ -104,13 +104,16 @@ Public Class Form1
             If blnIsStartMoving = True Then
                 aryNoteValue(pntLastMousePos.X, pntLastMousePos.Y) = BlockValue.Start
                 blnIsStartMoving = False
-                lstLastNote.Clear()  'Clear the list for next movement
+                lstLastNote.Clear()  'Clear the list for next movement (needed?)
             ElseIf blnIsBodyMoving = True Then
 
             ElseIf blnIsCloseMoving = True Then
-
+                aryNoteValue(pntLastMousePos.X, pntLastMousePos.Y) = BlockValue.Close
+                blnIsCloseMoving = False
+                lstLastNote.Clear()  'Clear the list for next movement (needed?)
             End If
             Refresh()
+
         End If
     End Sub
 
@@ -144,18 +147,16 @@ Public Class Form1
             End Select
 
             If aryNoteValue(shtXIndex, shtYIndex) = BlockValue.Empty Then
-                Me.tbxDebugLog.Text += " 0"
                 'places a note at the specific place clicked
                 FindAndDeleteNote(shtXIndex + 1, shtYIndex)
                 aryNoteValue(shtXIndex + 1, shtYIndex) = BlockValue.Close
                 aryNoteValue(shtXIndex, shtYIndex) = BlockValue.Start
 
-            ElseIf aryNoteValue(shtXIndex, shtYIndex) = BlockValue.Start Then
+            ElseIf aryNoteValue(shtXIndex, shtYIndex) = BlockValue.Start Then  'Clicking on the start block
                 If blnIsStartMoving = False Then
-                    Me.tbxDebugLog.Text += " 1"
                     'changes the colour of the start block
                     aryNoteValue(shtXIndex, shtYIndex) = BlockValue.StartColour  'Colour change is so you know you clicked it.
-                    pntLastMousePos = New Point(shtXIndex, shtYIndex)
+                    pntLastMousePos = New Point(shtXIndex, shtYIndex)  'Set last position
 
                     Dim shtCurrentPlace As Short = 0
                     While aryNoteValue(shtXIndex + shtCurrentPlace, shtYIndex) <> 3
@@ -167,15 +168,17 @@ Public Class Form1
                     blnIsStartMoving = True
 
                 End If
-            ElseIf aryNoteValue(shtXIndex, shtYIndex) = BlockValue.Body Then
+            ElseIf aryNoteValue(shtXIndex, shtYIndex) = BlockValue.Body Then  'Clicking on the middle block
                 If blnIsBodyMoving = False Then
-                    Me.tbxDebugLog.Text += " 2"
+
                     blnIsBodyMoving = True
 
                 End If
-            ElseIf aryNoteValue(shtXIndex, shtYIndex) = BlockValue.Close Then
+            ElseIf aryNoteValue(shtXIndex, shtYIndex) = BlockValue.Close Then  'Clicking on the end block (close block)
                 If blnIsCloseMoving = False Then
-                    Me.tbxDebugLog.Text += " 3"
+                    aryNoteValue(shtXIndex, shtYIndex) = BlockValue.CloseColour  'Colour change is so you know you clicked it.
+                    pntLastMousePos = New Point(shtXIndex, shtYIndex)  'Set last position
+
                     blnIsCloseMoving = True
 
                 End If
@@ -268,7 +271,6 @@ Public Class Form1
         If blnIsStartMoving = True Then
             shtXIndex = (MousePosition.X - (Me.Bounds.Location.X + 23)) \ shtBlockSizeX + 1
             shtYIndex = (MousePosition.Y - (Me.Bounds.Location.Y + 45)) \ shtBlockSizeY + 1
-            Me.Text = shtYIndex.ToString & " " & pntLastMousePos.Y.ToString
 
             If shtXIndex <> pntLastMousePos.X OrElse shtYIndex <> pntLastMousePos.Y Then  'If the cursor has moved from last position
                 FindAndDeleteNote(pntLastMousePos.X, pntLastMousePos.Y) 'Deletes the last note.
@@ -282,6 +284,37 @@ Public Class Form1
                 Next block
                 pntLastMousePos = New Point(shtXIndex, shtYIndex)
                 Refresh()
+
+            End If
+
+        ElseIf blnIsCloseMoving = True Then
+            shtXIndex = (MousePosition.X - (Me.Bounds.Location.X + 23)) \ shtBlockSizeX + 1
+            shtYIndex = (MousePosition.Y - (Me.Bounds.Location.Y + 45)) \ shtBlockSizeY + 1
+
+            If shtXIndex <> pntLastMousePos.X Then  'If the cursor has moved from last position in the x axis
+                If shtXIndex > pntLastMousePos.X Then  'If the note is getting bigger
+                    Dim shtCurrentPlace As Short = 0
+                    While pntLastMousePos.X + shtCurrentPlace <= shtXIndex - 1
+                        aryNoteValue(pntLastMousePos.X + shtCurrentPlace, pntLastMousePos.Y) = BlockValue.Body
+                        shtCurrentPlace += 1
+                    End While
+
+                    aryNoteValue(pntLastMousePos.X + shtCurrentPlace, pntLastMousePos.Y) = BlockValue.CloseColour
+                    pntLastMousePos = New Point(pntLastMousePos.X + shtCurrentPlace, pntLastMousePos.Y)
+
+                ElseIf shtXIndex < pntLastMousePos.X Then  'If the note is getting smaller
+                    Dim shtCurrentPlace As Short = 0
+                    While pntLastMousePos.X - shtCurrentPlace >= shtXIndex + 1
+                        aryNoteValue(pntLastMousePos.X - shtCurrentPlace, pntLastMousePos.Y) = BlockValue.Empty
+                        shtCurrentPlace += 1
+                    End While
+
+                    aryNoteValue(pntLastMousePos.X - shtCurrentPlace, pntLastMousePos.Y) = BlockValue.CloseColour
+                    pntLastMousePos = New Point(pntLastMousePos.X - shtCurrentPlace, pntLastMousePos.Y)
+
+                End If
+                Refresh()
+
             End If
 
         End If
