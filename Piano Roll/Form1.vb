@@ -48,6 +48,8 @@ Public Class Form1
     Private shtXIndex As Short = 0
     Private shtYIndex As Short = 0
 
+    Private shtGridMovement As Short = 0
+
     Private blnIsStartMoving As Boolean = False
     Private blnIsCloseMoving As Boolean = False
     Private blnIsBodyMoving As Boolean = False
@@ -68,7 +70,7 @@ Public Class Form1
     Private aryNoteValue(511, 59) As BlockValue 'Holds values of notes
 
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-
+        Me.KeyPreview = True
     End Sub
 
     Private Sub PaintNotes(ByVal o As Object, ByVal e As PaintEventArgs) Handles pbxGrid.Paint
@@ -80,17 +82,17 @@ Public Class Form1
                 If aryNoteValue(xPos, yPos) = BlockValue.Empty Then
                     Continue For 'TOME: Arbitrary but nice to see for parsing through code.
                 ElseIf aryNoteValue(xPos, yPos) = BlockValue.Start Then
-                    e.Graphics.DrawImage(imgRedTile, New Point(xPos * shtBlockSizeX, yPos * shtBlockSizeY))
+                    e.Graphics.DrawImage(imgRedTile, New Point((xPos - shtGridMovement) * shtBlockSizeX, yPos * shtBlockSizeY))
                 ElseIf aryNoteValue(xPos, yPos) = BlockValue.Body Then
-                    e.Graphics.DrawImage(imgBrownTile, New Point(xPos * shtBlockSizeX, yPos * shtBlockSizeY))
+                    e.Graphics.DrawImage(imgBrownTile, New Point((xPos - shtGridMovement) * shtBlockSizeX, yPos * shtBlockSizeY))
                 ElseIf aryNoteValue(xPos, yPos) = BlockValue.Close Then
-                    e.Graphics.DrawImage(imgTealTile, New Point(xPos * shtBlockSizeX, yPos * shtBlockSizeY))
+                    e.Graphics.DrawImage(imgTealTile, New Point((xPos - shtGridMovement) * shtBlockSizeX, yPos * shtBlockSizeY))
                 ElseIf aryNoteValue(xPos, yPos) = BlockValue.StartColour Then
-                    e.Graphics.DrawImage(imgTintedRedTile, New Point(xPos * shtBlockSizeX, yPos * shtBlockSizeY))
+                    e.Graphics.DrawImage(imgTintedRedTile, New Point((xPos - shtGridMovement) * shtBlockSizeX, yPos * shtBlockSizeY))
                 ElseIf aryNoteValue(xPos, yPos) = BlockValue.BodyColour Then
-                    e.Graphics.DrawImage(imgTintedBrownTile, New Point(xPos * shtBlockSizeX, yPos * shtBlockSizeY))
+                    e.Graphics.DrawImage(imgTintedBrownTile, New Point((xPos - shtGridMovement) * shtBlockSizeX, yPos * shtBlockSizeY))
                 ElseIf aryNoteValue(xPos, yPos) = BlockValue.CloseColour Then
-                    e.Graphics.DrawImage(imgTintedTealTile, New Point(xPos * shtBlockSizeX, yPos * shtBlockSizeY))
+                    e.Graphics.DrawImage(imgTintedTealTile, New Point((xPos - shtGridMovement) * shtBlockSizeX, yPos * shtBlockSizeY))
                 End If
             Next yPos
         Next xPos
@@ -98,7 +100,7 @@ Public Class Form1
 
     Private Sub MouseUpClick(ByVal sender As System.Object, ByVal e As MouseEventArgs) Handles pbxGrid.MouseUp
         If e.Button = Windows.Forms.MouseButtons.Left Then
-            shtXIndex = (e.X + 0) \ shtBlockSizeX
+            shtXIndex = (e.X - shtGridMovement) \ shtBlockSizeX
             shtYIndex = (e.Y + 0) \ shtBlockSizeY
 
             If blnIsStartMoving = True Then
@@ -119,7 +121,7 @@ Public Class Form1
 
     Private Sub MouseDownClick(ByVal sender As System.Object, ByVal e As MouseEventArgs) Handles pbxGrid.MouseDown
         If e.Button = Windows.Forms.MouseButtons.Left Then
-            shtXIndex = (e.X + 0) \ shtBlockSizeX
+            shtXIndex = (e.X) \ shtBlockSizeX + shtGridMovement
             shtYIndex = (e.Y + 0) \ shtBlockSizeY
             Me.Text = "X: " & shtXIndex & " Y: " & shtYIndex
 
@@ -178,7 +180,6 @@ Public Class Form1
                 If blnIsCloseMoving = False Then
                     aryNoteValue(shtXIndex, shtYIndex) = BlockValue.CloseColour  'Colour change is so you know you clicked it.
                     pntLastMousePos = New Point(shtXIndex, shtYIndex)  'Set last position
-
                     blnIsCloseMoving = True
 
                 End If
@@ -207,10 +208,6 @@ Public Class Form1
                 'check up the row.  If it is a part of a note, delete it.  
                 'When it hits the start of the note go back to the middle and start down the note until it hits the end of the note. 
 
-                'deletes the 3
-                aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
-                shtCurrentPlace -= 1
-
                 While aryNoteValue(xIndex + shtCurrentPlace, yIndex) <> BlockValue.Empty
                     If aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Body OrElse aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.BodyColour Then
                         aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
@@ -224,16 +221,16 @@ Public Class Form1
                     End If
                 End While
 
-                While aryNoteValue(xIndex + shtCurrentPlace, yIndex) <> BlockValue.Empty
+                While True
                     If aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Body OrElse aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.BodyColour Then
                         aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
-                        shtCurrentPlace += 1
 
                     ElseIf aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Close OrElse aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.CloseColour Then
                         aryNoteValue(xIndex + shtCurrentPlace, yIndex) = BlockValue.Empty
                         Exit While
 
                     End If
+                    shtCurrentPlace += 1
                 End While
 
             ElseIf aryNoteValue(xIndex, yIndex) = BlockValue.Close Then
@@ -268,8 +265,8 @@ Public Class Form1
     End Sub
 
     Private Sub tmrUpdateTick() Handles tmrUpdate.Tick
-        If blnIsStartMoving = True Then
-            shtXIndex = (MousePosition.X - (Me.Bounds.Location.X + 23)) \ shtBlockSizeX + 1
+        If blnIsStartMoving = True Then  'Run while holding the note
+            shtXIndex = (MousePosition.X - (Me.Bounds.Location.X + 23)) \ shtBlockSizeX + 1 + shtGridMovement
             shtYIndex = (MousePosition.Y - (Me.Bounds.Location.Y + 45)) \ shtBlockSizeY + 1
 
             If shtXIndex <> pntLastMousePos.X OrElse shtYIndex <> pntLastMousePos.Y Then  'If the cursor has moved from last position
@@ -287,8 +284,8 @@ Public Class Form1
 
             End If
 
-        ElseIf blnIsCloseMoving = True Then
-            shtXIndex = (MousePosition.X - (Me.Bounds.Location.X + 23)) \ shtBlockSizeX + 1
+        ElseIf blnIsCloseMoving = True Then  'Run while extending the note
+            shtXIndex = (MousePosition.X - (Me.Bounds.Location.X + 23)) \ shtBlockSizeX + 1 + shtGridMovement
             shtYIndex = (MousePosition.Y - (Me.Bounds.Location.Y + 45)) \ shtBlockSizeY + 1
 
             If shtXIndex <> pntLastMousePos.X Then  'If the cursor has moved from last position in the x axis
@@ -314,10 +311,33 @@ Public Class Form1
 
                 End If
                 Refresh()
-
             End If
-
         End If
+    End Sub
+
+    Private Sub DeleteNote(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+        If e.KeyCode = Keys.Escape Then
+            shtXIndex = (MousePosition.X - (Me.Bounds.Location.X + 23)) \ shtBlockSizeX + 1 + shtGridMovement
+            shtYIndex = (MousePosition.Y - (Me.Bounds.Location.Y + 45)) \ shtBlockSizeY + 1
+
+            FindAndDeleteNote(shtXIndex, shtYIndex)
+
+            blnIsStartMoving = False
+            blnIsCloseMoving = False
+            blnIsBodyMoving = False
+
+            Refresh()
+        End If
+    End Sub
+
+    Private Sub btnRight_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRight.Click
+        shtGridMovement += 1
+        Refresh()
+    End Sub
+
+    Private Sub btnLeft_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnLeft.Click
+        shtGridMovement -= 1
+        Refresh()
     End Sub
 End Class
 
