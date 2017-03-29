@@ -143,6 +143,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="BrownTile.png" />
+    <Content Include="DarkDarkGreyTile.png" />
+    <Content Include="DarkGreyTile.png" />
     <Content Include="Sounds\Chiptune.wav" />
     <Content Include="game.ico" />
     <Content Include="Grid of tiles.png" />
