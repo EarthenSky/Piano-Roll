@@ -119,7 +119,7 @@ Public Class Form1
                 blnIsStartMoving = False
                 lstLastNote.Clear()  'Clear the list for next movement (needed?)
             ElseIf blnIsBodyMoving = True Then
-
+                blnIsBodyMoving = False
             ElseIf blnIsCloseMoving = True Then
                 aryNoteValue(pntLastMousePos.X, pntLastMousePos.Y) = BlockValue.Close
                 blnIsCloseMoving = False
