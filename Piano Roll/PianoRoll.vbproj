@@ -142,6 +142,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="BarMarker.png" />
     <Content Include="BrownTile.png" />
     <Content Include="DarkDarkGreyTile.png" />
     <Content Include="DarkGreyTile.png" />

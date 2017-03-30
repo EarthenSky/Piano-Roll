@@ -43,6 +43,7 @@ Public Class Form1
     Const shtBlockSizeX As Short = 8
     Const shtBlockSizeY As Short = 8
 
+    Private shtCurrentNotePlayIndex = 0
     Private shtBPM As Short = 120
 
     Private shtMouseX As Short = 0
@@ -68,6 +69,7 @@ Public Class Form1
     Private imgTintedBrownTile As Image = Image.FromFile(currentFileDirectory & "TintedBrownTile.png")
     Private imgTintedTealTile As Image = Image.FromFile(currentFileDirectory & "TintedTealTile.png")
     Private imgDarkDarkGreyTile As Image = Image.FromFile(currentFileDirectory & "DarkDarkGreyTile.png")
+    Private imgBarMarker As Image = Image.FromFile(currentFileDirectory & "BarMarker.png")
 
     Private aryNoteValue(511, 59) As BlockValue 'Holds values of notes
 
@@ -98,9 +100,12 @@ Public Class Form1
                 End If
             Next yPos
         Next xPos
+        'Dim obj As System.Drawing.Graphics
+        'obj = pbxBarMarker.CreateGraphics()
+        'obj.DrawImage(imgBarMarker, New Point(-shtGridMovement * shtBlockSizeX + 12, 0))
 
         If -shtGridMovement > 0 Then
-            For gridX As Short = 0 To -shtGridMovement
+            For gridX As Short = 0 To -shtGridMovement - 1
                 For yPos As Short = 0 To aryNoteValue.GetLength(1) - 1
                     e.Graphics.DrawImage(imgDarkDarkGreyTile, New Point(gridX * shtBlockSizeX, yPos * shtBlockSizeY))
                 Next yPos
@@ -109,6 +114,13 @@ Public Class Form1
 
     End Sub
 
+    Private Sub PaintBarMarkers(ByVal o As Object, ByVal e As PaintEventArgs) Handles pbxBarMarker.Paint
+        For index As Short = shtGridMovement To aryNoteValue.GetLength(0) - 1
+            If index Mod 32 = 0 Then
+                e.Graphics.DrawImage(imgBarMarker, New Point((-shtGridMovement + index) * shtBlockSizeX, 0))
+            End If
+        Next
+    End Sub
     Private Sub MouseUpClick(ByVal sender As System.Object, ByVal e As MouseEventArgs) Handles pbxGrid.MouseUp
         If e.Button = Windows.Forms.MouseButtons.Left Then
             shtMouseX = (e.X - shtGridMovement) \ shtBlockSizeX
@@ -401,6 +413,29 @@ Public Class Form1
         shtGridMovement -= 1
         Refresh()
     End Sub
+
+    Private Sub btnPlay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPlay.Click
+        tmrBPMRun.Interval = 1000 / (shtBPM / 60)  'Convert bpm to beats per seconds and divide 1 second by that
+        tmrBPMRun.Enabled = True
+    End Sub
+
+    Private Sub tmrBPMRun_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrBPMRun.Tick
+        If shtCurrentNotePlayIndex <= 511 Then
+            shtCurrentNotePlayIndex += 1
+            For yPos As Short = 0 To aryNoteValue.GetLength(1) - 1
+                If aryNoteValue(shtCurrentNotePlayIndex, yPos) = BlockValue.Empty Then
+
+                End If
+            Next yPos
+        End If
+
+    End Sub
+
+    Private Sub btnStop_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStop.Click  'Turns timer off then sets the place to run the notes at to 0
+        tmrBPMRun.Enabled = False
+        shtCurrentNotePlayIndex = 0
+    End Sub
+
 End Class
 
 '//           ▄███▄  /

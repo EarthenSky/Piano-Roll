@@ -27,10 +27,14 @@ Partial Class Form1
         Me.btnRight = New System.Windows.Forms.Button()
         Me.btnPlay = New System.Windows.Forms.Button()
         Me.tbxDebugLog = New System.Windows.Forms.TextBox()
-        Me.pbxGrid = New System.Windows.Forms.PictureBox()
         Me.tmrUpdate = New System.Windows.Forms.Timer(Me.components)
         Me.Label1 = New System.Windows.Forms.Label()
+        Me.tmrBPMRun = New System.Windows.Forms.Timer(Me.components)
+        Me.btnStop = New System.Windows.Forms.Button()
+        Me.pbxGrid = New System.Windows.Forms.PictureBox()
+        Me.pbxBarMarker = New System.Windows.Forms.PictureBox()
         CType(Me.pbxGrid, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.pbxBarMarker, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'btnLeft
@@ -65,21 +69,12 @@ Partial Class Form1
         '
         'tbxDebugLog
         '
-        Me.tbxDebugLog.Location = New System.Drawing.Point(330, 497)
+        Me.tbxDebugLog.Location = New System.Drawing.Point(442, 497)
         Me.tbxDebugLog.Multiline = True
         Me.tbxDebugLog.Name = "tbxDebugLog"
-        Me.tbxDebugLog.Size = New System.Drawing.Size(642, 32)
+        Me.tbxDebugLog.Size = New System.Drawing.Size(530, 32)
         Me.tbxDebugLog.TabIndex = 4
         Me.tbxDebugLog.Text = "5 octaves, B7 - B2"
-        '
-        'pbxGrid
-        '
-        Me.pbxGrid.BackColor = System.Drawing.SystemColors.ButtonFace
-        Me.pbxGrid.Location = New System.Drawing.Point(12, 12)
-        Me.pbxGrid.Name = "pbxGrid"
-        Me.pbxGrid.Size = New System.Drawing.Size(960, 479)
-        Me.pbxGrid.TabIndex = 5
-        Me.pbxGrid.TabStop = False
         '
         'tmrUpdate
         '
@@ -91,11 +86,41 @@ Partial Class Form1
         Me.Label1.AutoSize = True
         Me.Label1.BackColor = System.Drawing.SystemColors.ScrollBar
         Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(208, 498)
+        Me.Label1.Location = New System.Drawing.Point(320, 498)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(116, 29)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "BPM: 120"
+        '
+        'tmrBPMRun
+        '
+        '
+        'btnStop
+        '
+        Me.btnStop.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnStop.Location = New System.Drawing.Point(208, 497)
+        Me.btnStop.Name = "btnStop"
+        Me.btnStop.Size = New System.Drawing.Size(106, 32)
+        Me.btnStop.TabIndex = 6
+        Me.btnStop.Text = "Stop"
+        Me.btnStop.UseVisualStyleBackColor = True
+        '
+        'pbxGrid
+        '
+        Me.pbxGrid.BackColor = System.Drawing.SystemColors.ButtonFace
+        Me.pbxGrid.Location = New System.Drawing.Point(12, 12)
+        Me.pbxGrid.Name = "pbxGrid"
+        Me.pbxGrid.Size = New System.Drawing.Size(960, 479)
+        Me.pbxGrid.TabIndex = 5
+        Me.pbxGrid.TabStop = False
+        '
+        'pbxBarMarker
+        '
+        Me.pbxBarMarker.Location = New System.Drawing.Point(12, 0)
+        Me.pbxBarMarker.Name = "pbxBarMarker"
+        Me.pbxBarMarker.Size = New System.Drawing.Size(960, 12)
+        Me.pbxBarMarker.TabIndex = 8
+        Me.pbxBarMarker.TabStop = False
         '
         'Form1
         '
@@ -103,6 +128,8 @@ Partial Class Form1
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.SystemColors.GradientActiveCaption
         Me.ClientSize = New System.Drawing.Size(984, 541)
+        Me.Controls.Add(Me.pbxBarMarker)
+        Me.Controls.Add(Me.btnStop)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.pbxGrid)
         Me.Controls.Add(Me.tbxDebugLog)
@@ -113,6 +140,7 @@ Partial Class Form1
         Me.Name = "Form1"
         Me.Text = "Piano Roll"
         CType(Me.pbxGrid, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.pbxBarMarker, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -126,4 +154,7 @@ Partial Class Form1
     Friend WithEvents pbxGrid As System.Windows.Forms.PictureBox
     Friend WithEvents tmrUpdate As Timer
     Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents tmrBPMRun As System.Windows.Forms.Timer
+    Friend WithEvents btnStop As System.Windows.Forms.Button
+    Friend WithEvents pbxBarMarker As System.Windows.Forms.PictureBox
 End Class
