@@ -119,7 +119,7 @@ Public Class Form1
                 blnIsStartMoving = False
                 lstLastNote.Clear()  'Clear the list for next movement (needed?)
             ElseIf blnIsBodyMoving = True Then
-
+                blnIsBodyMoving = False
             ElseIf blnIsCloseMoving = True Then
                 aryNoteValue(pntLastMousePos.X, pntLastMousePos.Y) = BlockValue.Close
                 blnIsCloseMoving = False
@@ -177,7 +177,7 @@ Public Class Form1
                     pntLastMousePos = New Point(shtMouseX, shtMouseY)  'Set last position
 
                     Dim shtCurrentPlace As Short = 0
-                    While aryNoteValue(shtMouseX + shtCurrentPlace, shtMouseY) <> 3
+                    While aryNoteValue(shtMouseX + shtCurrentPlace, shtMouseY) <> BlockValue.Close
                         lstLastNote.Add(aryNoteValue(shtMouseX + shtCurrentPlace, shtMouseY))
                         shtCurrentPlace += 1
 
@@ -188,7 +188,20 @@ Public Class Form1
                 End If
             ElseIf aryNoteValue(shtMouseX, shtMouseY) = BlockValue.Body Then  'Clicking on the middle block
                 If blnIsBodyMoving = False Then
+                    Dim indexUp As Short = 0
+                    While aryNoteValue(shtMouseX + indexUp, shtMouseY) <> BlockValue.Start AndAlso _
+                          aryNoteValue(shtMouseX + indexUp, shtMouseY) <> BlockValue.StartColour  'Finds the start block
+                        indexUp -= 1
+                    End While
+                    pntLastNoteStartPos = New Point(shtMouseX + indexUp, shtMouseY)
+                    Dim shtCurrentPlace As Short = 0
+                    While aryNoteValue(pntLastNoteStartPos.X + shtCurrentPlace, shtMouseY) <> BlockValue.Close
+                        lstLastNote.Add(aryNoteValue(pntLastNoteStartPos.X + shtCurrentPlace, shtMouseY))
+                        shtCurrentPlace += 1
 
+                    End While
+                    lstLastNote.Add(aryNoteValue(pntLastNoteStartPos.X + shtCurrentPlace, shtMouseY))
+                    pntLastMousePos = New Point(shtMouseX, shtMouseY)
                     blnIsBodyMoving = True
 
                 End If
@@ -327,7 +340,6 @@ Public Class Form1
                 Refresh()
 
             End If
-
         ElseIf blnIsCloseMoving = True Then  'Run while extending the note
             shtMouseX = (MousePosition.X - (Me.Bounds.Location.X + 23)) \ shtBlockSizeX + 1 + shtGridMovement
             shtMouseY = (MousePosition.Y - (Me.Bounds.Location.Y + 45)) \ shtBlockSizeY + 1
@@ -357,6 +369,23 @@ Public Class Form1
                     End If
                 End If
                 Refresh()
+            End If
+        ElseIf blnIsBodyMoving = True Then
+            shtMouseX = (MousePosition.X - (Me.Bounds.Location.X + 23)) \ shtBlockSizeX + 1 + shtGridMovement  'Update position
+            shtMouseY = (MousePosition.Y - (Me.Bounds.Location.Y + 45)) \ shtBlockSizeY + 1
+            If shtMouseY <> pntLastMousePos.Y Then  'If the cursor has moved from last position
+                FindAndDeleteNote(pntLastMousePos.X, pntLastMousePos.Y) 'Deletes the last note.
+
+                Dim shtCurrentPlace As Short = 0
+                For Each block As BlockValue In lstLastNote 'places a new note
+                    FindAndDeleteNote(shtMouseX + shtCurrentPlace, shtMouseY)  'Makes sure the note is not placed ontop of another.  TODO: this is not the best solution
+                    aryNoteValue(pntLastNoteStartPos.X + shtCurrentPlace, shtMouseY) = block
+                    shtCurrentPlace += 1
+
+                Next block
+                pntLastMousePos = New Point(pntLastMousePos.X, shtMouseY)
+                Refresh()
+
             End If
         End If
     End Sub
