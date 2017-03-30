@@ -116,15 +116,21 @@ Public Class Form1
 
             If blnIsStartMoving = True Then
                 aryNoteValue(pntLastMousePos.X, pntLastMousePos.Y) = BlockValue.Start
-                blnIsStartMoving = False
+                pntLastMousePos = Point.Empty
+                pntLastNoteStartPos = Point.Empty
                 lstLastNote.Clear()  'Clear the list for next movement (needed?)
+                blnIsStartMoving = False
             ElseIf blnIsBodyMoving = True Then
+                pntLastMousePos = Point.Empty
+                pntLastNoteStartPos = Point.Empty
+                lstLastNote.Clear()  'Clear the list for next movement (needed?)
                 blnIsBodyMoving = False
             ElseIf blnIsCloseMoving = True Then
                 aryNoteValue(pntLastMousePos.X, pntLastMousePos.Y) = BlockValue.Close
-                blnIsCloseMoving = False
+                pntLastMousePos = Point.Empty
+                pntLastNoteStartPos = Point.Empty
                 lstLastNote.Clear()  'Clear the list for next movement (needed?)
-                pntLastNoteStartPos = Point.Empty  'Reset note
+                blnIsCloseMoving = False
             End If
             Refresh()
 
@@ -140,29 +146,6 @@ Public Class Form1
             If shtMouseX < 0 OrElse shtMouseX > 510 Then 'TODO: CLICK SIDEWAYS 400 TIMES
                 Exit Sub
             End If
-
-            'tests
-            Select Case (shtMouseY)
-                Case 0
-                    PlaySound(Note.Csh5, 50)
-                Case 1
-                    PlaySound(Note.C5, 50)
-                Case 2
-                    PlaySound(Note.B4, 50)
-                Case 3
-                    PlaySound(Note.Ash4, 50)
-                Case 4
-                    PlaySound(Note.A4, 50)
-                Case 5
-                Case 6
-                Case 7
-                Case 8
-                Case 9
-                Case 10
-                Case 11
-                Case 12
-
-            End Select
 
             If aryNoteValue(shtMouseX, shtMouseY) = BlockValue.Empty Then
                 'places a note at the specific place clicked
