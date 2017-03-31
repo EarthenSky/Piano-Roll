@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 
 '1 is start of note, 2 is body, 3 is end, 0 is no note.  All else is just a temp colour.
-Enum BlockValue
+Public Enum BlockValue
     Empty = 0
     Start = 1
     Body = 2
@@ -12,7 +12,7 @@ Enum BlockValue
 End Enum
 
 'Holds note values in hz
-Enum Note
+Public Enum Note
     B7 = 3951
     B6 = 1976
     Ash6 = 1865
@@ -70,8 +70,12 @@ Public Class Form1
     Private imgTintedTealTile As Image = Image.FromFile(currentFileDirectory & "TintedTealTile.png")
     Private imgDarkDarkGreyTile As Image = Image.FromFile(currentFileDirectory & "DarkDarkGreyTile.png")
     Private imgBarMarker As Image = Image.FromFile(currentFileDirectory & "BarMarker.png")
+    Private imgSmallBarMarker As Image = Image.FromFile(currentFileDirectory & "BarMarkerSmall.png")
+    Private imgPlaceBarMarker As Image = Image.FromFile(currentFileDirectory & "PlaceMarkerRed.png")
 
     Private aryNoteValue(511, 59) As BlockValue 'Holds values of notes
+
+    Public Event PlayNote(ByVal note As Note, ByVal length As Short)
 
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Me.KeyPreview = True
@@ -100,9 +104,6 @@ Public Class Form1
                 End If
             Next yPos
         Next xPos
-        'Dim obj As System.Drawing.Graphics
-        'obj = pbxBarMarker.CreateGraphics()
-        'obj.DrawImage(imgBarMarker, New Point(-shtGridMovement * shtBlockSizeX + 12, 0))
 
         If -shtGridMovement > 0 Then
             For gridX As Short = 0 To -shtGridMovement - 1
@@ -112,15 +113,23 @@ Public Class Form1
             Next gridX
         End If
 
+        e.Graphics.DrawImage(imgPlaceBarMarker, New Point((shtCurrentNotePlayIndex - shtGridMovement) * shtBlockSizeX, 0))
+
     End Sub
 
     Private Sub PaintBarMarkers(ByVal o As Object, ByVal e As PaintEventArgs) Handles pbxBarMarker.Paint
         For index As Short = shtGridMovement To aryNoteValue.GetLength(0) - 1
-            If index Mod 32 = 0 Then
-                e.Graphics.DrawImage(imgBarMarker, New Point((-shtGridMovement + index) * shtBlockSizeX, 0))
+            If index Mod 8 = 0 Then
+                If index Mod 32 = 0 Then
+                    e.Graphics.DrawImage(imgBarMarker, New Point((-shtGridMovement + index) * shtBlockSizeX, 0))
+                Else
+                    e.Graphics.DrawImage(imgSmallBarMarker, New Point((-shtGridMovement + index) * shtBlockSizeX, 4))
+                End If
+
             End If
         Next
     End Sub
+
     Private Sub MouseUpClick(ByVal sender As System.Object, ByVal e As MouseEventArgs) Handles pbxGrid.MouseUp
         If e.Button = Windows.Forms.MouseButtons.Left Then
             shtMouseX = (e.X - shtGridMovement) \ shtBlockSizeX
@@ -312,7 +321,7 @@ Public Class Form1
     ''' Plays a sound based on the note and the length
     ''' </summary>
     ''' <param name="length">Input a number like 7/32</param>
-    Private Sub PlaySound(ByVal note As Note, ByVal length As Short)
+    Private Sub PlaySound(ByVal note As Note, ByVal length As Short) Handles Me.PlayNote
         Console.Beep(note, length)
     End Sub
 
@@ -415,7 +424,7 @@ Public Class Form1
     End Sub
 
     Private Sub btnPlay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPlay.Click
-        tmrBPMRun.Interval = 1000 / (shtBPM / 60)  'Convert bpm to beats per seconds and divide 1 second by that
+        tmrBPMRun.Interval = (1000.0 * 60.0) / shtBPM / 8  'beats per minuite set to bpm then by notes smallness
         tmrBPMRun.Enabled = True
     End Sub
 
@@ -423,17 +432,19 @@ Public Class Form1
         If shtCurrentNotePlayIndex <= 511 Then
             shtCurrentNotePlayIndex += 1
             For yPos As Short = 0 To aryNoteValue.GetLength(1) - 1
-                If aryNoteValue(shtCurrentNotePlayIndex, yPos) = BlockValue.Empty Then
-
+                If aryNoteValue(shtCurrentNotePlayIndex, yPos) = BlockValue.Start Then
+                    RaiseEvent PlayNote(Note.B7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                    'PlaySound(Note.B7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
                 End If
             Next yPos
         End If
-
+        Refresh()
     End Sub
 
     Private Sub btnStop_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStop.Click  'Turns timer off then sets the place to run the notes at to 0
         tmrBPMRun.Enabled = False
         shtCurrentNotePlayIndex = 0
+        Refresh()
     End Sub
 
 End Class
