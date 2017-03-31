@@ -321,7 +321,7 @@ Public Class Form1
             shtMouseX = (MousePosition.X - (Me.Bounds.Location.X + 23)) \ shtBlockSizeX + 1 + shtGridMovement
             shtMouseY = (MousePosition.Y - (Me.Bounds.Location.Y + 45)) \ shtBlockSizeY + 1
 
-            If shtMouseX <> pntLastMousePos.X OrElse shtMouseY <> pntLastMousePos.Y Then  'If the cursor has moved from last position
+            If (shtMouseX <> pntLastMousePos.X OrElse shtMouseY <> pntLastMousePos.Y) And shtMouseX >= 0 Then  'If the cursor has moved from last position
                 FindAndDeleteNote(pntLastMousePos.X, pntLastMousePos.Y) 'Deletes the last note.
 
                 Dim shtCurrentPlace As Short = 0
