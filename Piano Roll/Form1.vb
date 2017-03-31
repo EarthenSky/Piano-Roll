@@ -75,8 +75,6 @@ Public Class Form1
 
     Private aryNoteValue(511, 59) As BlockValue 'Holds values of notes
 
-    Public Event PlayNote(ByVal note As Note, ByVal length As Short)
-
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Me.KeyPreview = True
     End Sub
@@ -321,8 +319,9 @@ Public Class Form1
     ''' Plays a sound based on the note and the length
     ''' </summary>
     ''' <param name="length">Input a number like 7/32</param>
-    Private Sub PlaySound(ByVal note As Note, ByVal length As Short) Handles Me.PlayNote
+    Private Sub PlaySound(ByVal note As Note, ByVal length As Short)
         Console.Beep(note, length)
+        shtCurrentNotePlayIndex += length / 8 / 60 'tpdo: this is not good working
     End Sub
 
     Private Sub tmrUpdateTick() Handles tmrUpdate.Tick
@@ -433,8 +432,7 @@ Public Class Form1
             shtCurrentNotePlayIndex += 1
             For yPos As Short = 0 To aryNoteValue.GetLength(1) - 1
                 If aryNoteValue(shtCurrentNotePlayIndex, yPos) = BlockValue.Start Then
-                    RaiseEvent PlayNote(Note.B7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
-                    'PlaySound(Note.B7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                    PlaySound(Note.B7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
                 End If
             Next yPos
         End If
