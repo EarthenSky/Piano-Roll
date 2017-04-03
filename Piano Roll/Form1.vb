@@ -16,6 +16,17 @@ End Enum
 'Holds note values in hz
 Public Enum Note
     B7 = 3951
+    Ash7 = 3729
+    A7 = 3520
+    Gsh7 = 3322
+    G7 = 3136
+    Fsh7 = 2960
+    F7 = 2794
+    E7 = 2637
+    Dsh7 = 2489
+    D7 = 2349
+    Csh7 = 2217
+    C7 = 2093
     B6 = 1976
     Ash6 = 1865
     A6 = 1760
@@ -435,7 +446,49 @@ Public Class Form1
             shtCurrentNotePlayIndex += 1
             For yPos As Short = 0 To aryNoteValue.GetLength(1) - 1
                 If aryNoteValue(shtCurrentNotePlayIndex, yPos) = BlockValue.Start Then
-                    PlaySound(Note.B7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                    Select Case (yPos)
+                        Case 0
+                            PlaySound(Note.B7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 1
+                            PlaySound(Note.Ash7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 2
+                            PlaySound(Note.A7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 3
+                            PlaySound(Note.Gsh7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 4
+                            PlaySound(Note.G7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 5
+                            PlaySound(Note.Fsh7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 6
+                            PlaySound(Note.F7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 7
+                            PlaySound(Note.E7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 8
+                            PlaySound(Note.Dsh7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 9
+                            PlaySound(Note.D7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 10
+                            PlaySound(Note.B7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 11
+                            PlaySound(Note.Ash7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 12
+                            PlaySound(Note.A7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 13
+                            PlaySound(Note.Gsh7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 14
+                            PlaySound(Note.G7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 15
+                            PlaySound(Note.Fsh7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 16
+                            PlaySound(Note.F7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 17
+                            PlaySound(Note.E7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 18
+                            PlaySound(Note.Dsh7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                        Case 19
+                            PlaySound(Note.D7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                    End Select
+
                 End If
             Next yPos
         End If
