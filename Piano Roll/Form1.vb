@@ -1,6 +1,9 @@
 ﻿Imports System.IO
 Imports System.Media
 Imports System.Threading
+Imports WMPLib
+Imports NAudio
+Imports NAudio.Wave
 
 '1 is start of note, 2 is body, 3 is end, 0 is no note.  All else is just a temp colour.
 Public Enum BlockValue
@@ -513,6 +516,57 @@ End Class
 '//  |________________________|
 
 Public Class Beep
+    Private Shared Sub CloseWaveOut()
+        Dim waveOutDevice As IWavePlayer = Nothing
+        If waveOutDevice IsNot Nothing Then
+            waveOutDevice.[Stop]()
+        End If
+        If waveOutDevice IsNot Nothing Then
+            waveOutDevice.Dispose()
+            waveOutDevice = Nothing
+        End If
+    End Sub
+
+    Private Shared Function CreateInputStream(ByVal mediacontent As Byte()) As WaveStream
+        Dim inputStream As WaveChannel32
+        Dim ms As Stream = New MemoryStream(mediacontent)
+        Dim wavReader As WaveStream = New WaveFileReader(ms)
+        inputStream = New WaveChannel32(wavReader)
+        Return inputStream
+    End Function
+
+    Private Shared Sub PlayStream(ByVal stream As System.IO.MemoryStream)
+        Dim myBytes() As Byte = stream.ToArray
+        Dim stream2 As WaveStream = CreateInputStream(myBytes)
+        Dim waveOutDevice As IWavePlayer
+        waveOutDevice = New WaveOut()
+
+        Try
+            waveOutDevice.Init(stream2)
+            waveOutDevice.Play()
+        Catch ex As MmException
+            waveOutDevice.Init(stream2)
+            waveOutDevice.Play()
+        End Try
+
+        CloseWaveOut()
+    End Sub
+    'Private Sub Play_WMP(ByVal ResourceName As String)
+    '    Dim SFX As New WindowsMediaPlayer()
+
+    '    Dim ShortPath As String = My.Resources.ResourceManager.BaseName
+    '    Dim LongPath As String = IO.Path.GetFullPath(My.Resources.ResourceManager.BaseName)
+    '    Dim FullPath As String = LongPath.Substring(0, LongPath.Length - ShortPath.Length - 10) & "Resources\"
+
+    '    SFX.URL = FullPath & ResourceName
+    '    SFX.controls.play()
+    'End Sub
+
+    'Private Sub Play_WMP2(ByVal FileName As String)
+    '    Dim SFX As New WindowsMediaPlayer()
+    '    SFX.URL = FileName
+    '    SFX.controls.play()
+    'End Sub
     Shared Sub Beep(ByVal Amplitude As Integer, _
              ByVal Frequency As Integer, _
              ByVal Duration As Integer)
@@ -536,12 +590,19 @@ Public Class Beep
                 Next
                 BW.Flush()
                 MS.Seek(0, SeekOrigin.Begin)
-                Using SP As New SoundPlayer(MS)
-                    SP.Play()
-                    'While SP.IsLoadCompleted = True
-                    '    Thread.Sleep(1000)
-                    'End While
-                End Using
+
+                PlayStream(MS)
+                
+                'Dim SFX As New WindowsMediaPlayer()
+                'SFX.URL = MakeMp3(MS)
+                'SFX.controls.play()
+
+                'Using SP As New SoundPlayer(MS)
+                '    SP.Play()
+                '    'While SP.IsLoadCompleted = True
+                '    '    Thread.Sleep(1000)
+                '    'End While
+                'End Using
             End Using
         End Using
     End Sub
