@@ -473,17 +473,17 @@ Public Class Form1
                         Case 10
                             PlaySound(Note.B7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
                         Case 11
-                            PlaySound(Note.Ash7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                            PlaySound(Note.Csh7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
                         Case 12
-                            PlaySound(Note.A7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                            PlaySound(Note.C7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
                         Case 13
-                            PlaySound(Note.Gsh7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                            PlaySound(Note.B6, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
                         Case 14
-                            PlaySound(Note.G7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                            PlaySound(Note.Ash6, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
                         Case 15
-                            PlaySound(Note.Fsh7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                            PlaySound(Note.A6, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
                         Case 16
-                            PlaySound(Note.F7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                            PlaySound(Note.Gsh7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
                         Case 17
                             PlaySound(Note.E7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
                         Case 18
