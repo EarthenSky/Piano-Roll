@@ -33,6 +33,10 @@ Public Enum Note
     B6 = 1976
     Ash6 = 1865
     A6 = 1760
+    Gsh6 = 1661
+    G6 = 1568
+    Fsh6 = 1480
+    F6 = 1397
     B5 = 988
     Gsh5 = 831
     G5 = 784
@@ -444,7 +448,7 @@ Public Class Form1
         tmrBPMRun.Enabled = True
     End Sub
 
-    Private Sub tmrBPMRun_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrBPMRun.Tick
+    Public Sub tmrBPMRun_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrBPMRun.Tick
         If shtCurrentNotePlayIndex <= 511 Then
             shtCurrentNotePlayIndex += 1
             For yPos As Short = 0 To aryNoteValue.GetLength(1) - 1
@@ -483,15 +487,14 @@ Public Class Form1
                         Case 15
                             PlaySound(Note.A6, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
                         Case 16
-                            PlaySound(Note.Gsh7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                            PlaySound(Note.Gsh6, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
                         Case 17
-                            PlaySound(Note.E7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                            PlaySound(Note.G6, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
                         Case 18
-                            PlaySound(Note.Dsh7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                            PlaySound(Note.Fsh7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
                         Case 19
-                            PlaySound(Note.D7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
+                            PlaySound(Note.F7, FindNoteLenth(shtCurrentNotePlayIndex, yPos) * ((1000.0 * 60.0) / shtBPM / 8))
                     End Select
-
                 End If
             Next yPos
         End If
@@ -502,6 +505,7 @@ Public Class Form1
         tmrBPMRun.Enabled = False
         shtCurrentNotePlayIndex = 0
         Refresh()
+        Beep.EmptyList()
     End Sub
 
 End Class
@@ -516,6 +520,23 @@ End Class
 '//  |________________________|
 
 Public Class Beep
+
+    Private Shared wavReaders As New List(Of IWavePlayer)
+
+    Public Shared Sub EmptyList()
+        For Each reader In wavReaders
+            If reader IsNot Nothing Then
+                reader.[Stop]()
+            End If
+            If reader IsNot Nothing Then
+                reader.Dispose()
+                reader = Nothing
+            End If
+        Next
+        wavReaders.Clear()
+
+    End Sub
+
     Private Shared Sub CloseWaveOut()
         Dim waveOutDevice As IWavePlayer = Nothing
         If waveOutDevice IsNot Nothing Then
@@ -538,16 +559,11 @@ Public Class Beep
     Private Shared Sub PlayStream(ByVal stream As System.IO.MemoryStream)
         Dim myBytes() As Byte = stream.ToArray
         Dim stream2 As WaveStream = CreateInputStream(myBytes)
-        Dim waveOutDevice As IWavePlayer
-        waveOutDevice = New WaveOut()
 
-        Try
-            waveOutDevice.Init(stream2)
-            waveOutDevice.Play()
-        Catch ex As MmException
-            waveOutDevice.Init(stream2)
-            waveOutDevice.Play()
-        End Try
+        wavReaders.Add(New WaveOut())
+
+        wavReaders.Item(wavReaders.Count - 1).Init(stream2)
+        wavReaders.Item(wavReaders.Count - 1).Play()
 
         CloseWaveOut()
     End Sub
@@ -592,7 +608,7 @@ Public Class Beep
                 MS.Seek(0, SeekOrigin.Begin)
 
                 PlayStream(MS)
-                
+
                 'Dim SFX As New WindowsMediaPlayer()
                 'SFX.URL = MakeMp3(MS)
                 'SFX.controls.play()
